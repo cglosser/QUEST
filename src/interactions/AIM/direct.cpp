@@ -20,25 +20,58 @@ AIM::DirectInteraction::DirectInteraction(
 const InteractionBase::ResultArray &AIM::DirectInteraction::evaluate(
     const int time_idx)
 {
+  constexpr int RHO_01 = 1;
+
+  results.setZero();
+  past_terms_of_convolution.setZero();
+
+  for(int pair_idx = 0; pair_idx < shape_[0]; ++pair_idx) {
+    const auto &pair = (*interaction_pairs_)[pair_idx];
+
+    for(int i = 1; i < shape_[1]; ++i) {
+      const int s =
+          std::max(time_idx - floor_delays_[pair_idx] - i,
+                   static_cast<int>(history->array_.index_bases()[1]));
+
+      past_terms_of_convolution[pair.first] +=
+          (history->array_[pair.second][s][0])[RHO_01] *
+          coefficients_[pair_idx][i];
+      past_terms_of_convolution[pair.second] +=
+          (history->array_[pair.first][s][0])[RHO_01] *
+          coefficients_[pair_idx][i];
+    }
+
+    const int s = std::max(time_idx - floor_delays_[pair_idx],
+                           static_cast<int>(history->array_.index_bases()[1]));
+
+    results[pair.first] += (history->array_[pair.second][s][0])[RHO_01] *
+                           coefficients_[pair_idx][0];
+    results[pair.second] += (history->array_[pair.first][s][0])[RHO_01] *
+                            coefficients_[pair_idx][0];
+  }
+  results += past_terms_of_convolution;
+  return results;
+}
+
+const InteractionBase::ResultArray &
+AIM::DirectInteraction::evaluate_present_field(const int time_idx)
+{
+  constexpr int RHO_01 = 1;
+
   results.setZero();
 
   for(int pair_idx = 0; pair_idx < shape_[0]; ++pair_idx) {
     const auto &pair = (*interaction_pairs_)[pair_idx];
 
-    for(int i = 0; i < shape_[1]; ++i) {
-      const int s =
-          std::max(time_idx - floor_delays_[pair_idx] - i,
-                   static_cast<int>(history->array_.index_bases()[1]));
+    const int s = std::max(time_idx - floor_delays_[pair_idx],
+                           static_cast<int>(history->array_.index_bases()[1]));
 
-      constexpr int RHO_01 = 1;
-
-      results[pair.first] += (history->array_[pair.second][s][0])[RHO_01] *
-                             coefficients_[pair_idx][i];
-      results[pair.second] += (history->array_[pair.first][s][0])[RHO_01] *
-                              coefficients_[pair_idx][i];
-    }
+    results[pair.first] += (history->array_[pair.second][s][0])[RHO_01] *
+                           coefficients_[pair_idx][0];
+    results[pair.second] += (history->array_[pair.first][s][0])[RHO_01] *
+                            coefficients_[pair_idx][0];
   }
-
+  results += past_terms_of_convolution;
   return results;
 }
 

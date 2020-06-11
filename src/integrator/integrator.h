@@ -80,7 +80,7 @@ void Integrator::PredictorCorrector<soltype>::solve_step(const int step) const
 
   for(int m = 0; m < num_corrector_steps; ++m) {
     corrector(step);
-    rhs->evaluate(step);
+    rhs->evaluate_present(step);
   }
 }
 

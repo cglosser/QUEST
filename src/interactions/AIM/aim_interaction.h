@@ -60,9 +60,17 @@ class AIM::Interaction final : public InteractionBase {
 
   const ResultArray &evaluate(const int t)
   {
-    // I DON'T KNOW WHY THAT NEEDS A CONJUGATE!!!
     results =
         (ff.evaluate(t).conjugate() - nf.evaluate(t)) + direct.evaluate(t);
+    return results;
+  }
+
+  const ResultArray &evaluate_present_field(const int t)
+  {
+    // I DON'T KNOW WHY THAT NEEDS A CONJUGATE!!!
+    results = (ff.evaluate_present_field(t).conjugate() -
+               nf.evaluate_present_field(t)) +
+              direct.evaluate_present_field(t);
     return results;
   }
 

@@ -20,7 +20,7 @@ matrix_elements QuantumDot::liouville_rhs(const matrix_elements &rho,
   m1_temp -=
       rotating ? iu * rho[1] * (laser_freq - freq) : iu * rho[1] * (-freq);
 
-  const cmplx m1 = m1_temp;  // is this an appropriate way to do this?
+  const cmplx m1 = m1_temp;
   return matrix_elements(m0, m1);
 }
 

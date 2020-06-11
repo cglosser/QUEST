@@ -12,8 +12,10 @@ namespace Integrator {
 
 class Integrator::ODE_RHS : public RHS<double> {
  public:
-  ODE_RHS(const double, const std::shared_ptr<Integrator::History<double>>,
+  ODE_RHS(const double,
+          const std::shared_ptr<Integrator::History<double>>,
           const std::vector<std::function<double(double, double)>>);
+  void evaluate_present(const int) const;
   void evaluate(const int) const;
 
  private:
@@ -35,5 +37,7 @@ void Integrator::ODE_RHS::evaluate(const int n) const
     history->array_[i][n][1] = rhs_functions[i](history->array_[i][n][0], time);
   }
 }
+
+void Integrator::ODE_RHS::evaluate_present(const int n) const { evaluate(n); }
 
 #endif

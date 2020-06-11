@@ -28,31 +28,65 @@ AIM::Nearfield::Nearfield(
       support_(shape_[0], {std::numeric_limits<int>::max(), 0}),
       coefficients_{coefficient_table()}
 {
-  if(interp_order != 5)
-    throw std::runtime_error(
-        "Lagrange interpolation of order != 5 is not supported in nearfield "
-        "calculations");
 }
 
 const InteractionBase::ResultArray &AIM::Nearfield::evaluate(const int time_idx)
 {
+  constexpr int RH0_01 = 1;
+
   results.setZero();
-  constexpr int RHO_01 = 1;
+  past_terms_of_convolution.setZero();
 
   for(int pair_idx = 0; pair_idx < shape_[0]; ++pair_idx) {
     const auto &pair = (*interaction_pairs_)[pair_idx];
 
-    for(int t = support_[pair_idx].begin; t < support_[pair_idx].end; ++t) {
+    for(int t = support_[pair_idx].begin + 1; t < support_[pair_idx].end; ++t) {
       const int s = std::max(
           time_idx - t, static_cast<int>(history->array_.index_bases()[1]));
 
-      results[pair.first] += (history->array_[pair.second][s][0])[RHO_01] *
-                             coefficients_[pair_idx][t][0];
-
-      results[pair.second] += (history->array_[pair.first][s][0])[RHO_01] *
-                              coefficients_[pair_idx][t][1];
+      past_terms_of_convolution[pair.first] +=
+          (history->array_[pair.second][s][0])[RHO_01] *
+          coefficients_[pair_idx][t][0];
+      past_terms_of_convolution[pair.second] +=
+          (history->array_[pair.first][s][0])[RHO_01] *
+          coefficients_[pair_idx][t][1];
     }
+    int t = support_[pair_idx].begin;
+    const int s = std::max(time_idx - t,
+                           static_cast<int>(history->array_.index_bases()[1]));
+    assert(support_[pair_idx].begin == 0);
+
+    results[pair.first] += (history->array_[pair.second][s][0])[RHO_01] *
+                           coefficients_[pair_idx][t][0];
+    results[pair.second] += (history->array_[pair.first][s][0])[RHO_01] *
+                            coefficients_[pair_idx][t][1];
   }
+  results += past_terms_of_convolution;
+
+  return results;
+}
+
+const InteractionBase::ResultArray &AIM::Nearfield::evaluate_present_field(
+    const int time_idx)
+{
+  constexpr int RH0_01 = 1;
+
+  results.setZero();
+
+  for(int pair_idx = 0; pair_idx < shape_[0]; ++pair_idx) {
+    const auto &pair = (*interaction_pairs_)[pair_idx];
+
+    int t = support_[pair_idx].begin;
+    const int s = std::max(time_idx - t,
+                           static_cast<int>(history->array_.index_bases()[1]));
+    assert(support_[pair_idx].begin == 0);
+
+    results[pair.first] += (history->array_[pair.second][s][0])[RHO_01] *
+                           coefficients_[pair_idx][t][0];
+    results[pair.second] += (history->array_[pair.first][s][0])[RHO_01] *
+                            coefficients_[pair_idx][t][1];
+  }
+  results += past_terms_of_convolution;
 
   return results;
 }

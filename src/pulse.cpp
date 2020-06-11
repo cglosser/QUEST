@@ -22,8 +22,7 @@ Eigen::Vector3d Pulse::operator()(const Eigen::Vector3d &r,
 {
   const double arg = wavevector.dot(r) - freq * (t - delay);
 
-  Eigen::Vector3d pulse_vector;  // is the convention to declare and define in
-                                 // the same line?
+  Eigen::Vector3d pulse_vector;
   pulse_vector = (amplitude / 2 * polarization) * gaussian(arg / width);
 
   pulse_vector *= rotating ? 1.0 : cos(arg);

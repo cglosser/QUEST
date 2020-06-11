@@ -24,6 +24,7 @@ class AIM::Nearfield final : public AimBase {
   ~Nearfield() = default;
 
   const ResultArray &evaluate(const int) final;
+  const ResultArray &evaluate_present_field(const int) final;
 
  private:
   struct support_range_t {

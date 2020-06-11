@@ -1,4 +1,5 @@
-[![DOI](https://zenodo.org/badge/37320094.svg)](https://zenodo.org/badge/latestdoi/37320094)
+[![Build Status](https://travis-ci.org/tbertus/QuEST.svg?branch=development)](https://travis-ci.org/tbertus/QuEST/branch/development) [![DOI](https://zenodo.org/badge/37320094.svg)](https://zenodo.org/badge/latestdoi/37320094)
+
 [![Article](https://img.shields.io/badge/article-Phys.%20Rev.%20A%2096%2C%20033816-B10DC9.svg)](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.96.033816)
 
 # QuEST: The Quantum Electromagnetics Simulation Toolbox

@@ -17,6 +17,7 @@ class Integrator::BlochRHS : public Integrator::RHS<Eigen::Vector2cd> {
            const std::shared_ptr<History<Eigen::Vector2cd>>,
            std::vector<std::shared_ptr<InteractionBase>>,
            std::vector<BlochFunctionType>);
+  void evaluate_present(const int) const override;
   void evaluate(const int) const override;
 
  private:
